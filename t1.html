@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Form Builder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link href="assets/css/lib/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/lib/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="assets/css/custom.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+	<!--them map-->
+	<link rel="stylesheet" href="nongnghiepangiang/css/leaflet.css" />
+	<script src="nongnghiepangiang/js2/leaflet.js"></script>
+	<script src="nongnghiepangiang/js2/jquery.min.js"></script>
+	<link href='nongnghiepangiang/js2/leaflet_fullscreen/leaflet.fullscreen.css' rel='stylesheet' />
+	<script src='nongnghiepangiang/js2/leaflet_fullscreen/Leaflet.fullscreen.min.js'></script>
+	
+	<link href="assets/css/switch.css" rel="stylesheet">
+	<script src='assets/js/redrose.js'></script>
+	<style>
+	#map {
+		height: 300px;
+		width: 100%;
+	}
+	.leaflet-left,.leaflet-top,.leaflet-right,.leaflet-left,.leaflet-bottom {
+		z-index: 0;
+	}
+	</style>
+	
+	<script>
+	/*-------
+	Localtion
+	--------*/
+	function getLocation() {
+		var x = document.getElementById("status");
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(showPosition);
+		} else { 
+			x.innerHTML = "Geolocation is not supported by this browser.";
+		}
+	}
+
+	function showPosition(position) {
+		//alert($('#lat').value);
+		document.getElementById('lat').value=position.coords.latitude;
+		document.getElementById('lon').value=position.coords.longitude;
+		//document.itemForm.lat.value=position.coords.latitude;
+		//document.itemForm.lon.value=position.coords.longitude;
+		loc2mark(position.coords.latitude,position.coords.longitude);
+	}
+
+	function loc2mark(lat,lon){
+		removemark();
+		marker = new L.marker([lat,lon], {draggable:'true'}).addTo(map);
+		map.panTo(new L.LatLng(lat, lon));
+		map.setZoom(16);
+		marker.on('dragend', function(event){
+			marker = event.target;
+			var position = marker.getLatLng();
+			marker.setLatLng(new L.LatLng(position.lat, position.lng),{draggable:'true'});
+			map.panTo(new L.LatLng(position.lat, position.lng));
+			map.setZoom(16);
+			//document.itemForm.lat.value=position.lat;
+			//document.itemForm.lon.value=position.lng;
+			document.getElementById('lat').value=position.lat;
+			document.getElementById('lon').value=position.lng;
+		});
+	}
+	function removemark(){
+		if(marker!=''){
+			map.removeLayer(marker);
+		}
+	}
+	
+	$(document).ready(function () {
+		map = L.map('map',{
+			fullscreenControl: {
+				pseudoFullscreen: false
+			}
+		}).setView([10.78205, 106.67038], 9);
+		var osmlyr = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			maxZoom: 18,
+			minZoom: 9,
+			//attribution: 'OSM'
+		//});
+		}).addTo(map);
+		
+		var vetinhmap = L.tileLayer('http://mt0.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+			maxZoom: 18,
+			minZoom: 9,
+		});
+		
+		var baseMaps = {
+			"Nền Vệ tinh": vetinhmap,
+			"OpenStreetMap": osmlyr
+		};
+		/*var overlayMaps = {
+			"Cities": cities
+		};*/
+		
+		L.control.layers(baseMaps).addTo(map);
+		
+		newMarkerGroup = new L.LayerGroup();
+		marker='';
+		map.on('click', function(e){
+		//map.once('click', function(e){
+			//map.removeLayer(marker);
+			removemark();
+			marker = new L.marker(e.latlng, {draggable:'true'}).addTo(map);
+			var coord = e.latlng.toString().split(',');
+			var lat = coord[0].split('(');
+			var lng = coord[1].split(')');
+			//document.itemForm.lat.value=lat[1];
+			//document.itemForm.lon.value=lng[0];
+			document.getElementById('lat').value=lat[1];
+			document.getElementById('lon').value=lng[0];
+			//alert("You clicked the map at latitude: " + lat[1] + " and longitude: " + lng[0]);
+			//alert(marker.getLatLng());
+			marker.on('dragend', function(event){
+				marker = event.target;
+				var position = marker.getLatLng();
+				marker.setLatLng(new L.LatLng(position.lat, position.lng),{draggable:'true'});
+				map.panTo(new L.LatLng(position.lat, position.lng));
+				//document.itemForm.lat.value=position.lat;
+				//document.itemForm.lon.value=position.lng;
+				document.getElementById('lat').value=position.lat;
+				document.getElementById('lon').value=position.lng;
+			});
+		});
+		
+		//load huong dan
+		//$('#huongdandiv').load('huongdandienthoai/index.html');
+		
+	})
+	</script>
+  </head>
+
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="#">Form Builder</a>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row clearfix">
+        <!-- Building Form. -->
+        <div class="span6">
+          <div class="clearfix">
+            <h2>Your Form <input type="button" value="Preview" class="btn btn-success" onclick="previewForm();"></h2>
+            <hr>
+			<div id="frm_preview"></div>
+			
+            <div id="build">
+              <form id="target" class="form-horizontal">
+              </form>
+            </div>
+          </div>
+		  
+		<!-- map--->
+		<div id="getlocdiv">
+		<div class="form-group">
+		<p class="submit">
+			<input name="localtion" id="localtion" type="button" value="Get Localtion" onclick="getLocation();" class="btn btn-success btn-block btn-lg"/>
+		</p>
+		</div>
+		
+		<div class="form-group">
+			<label class="control-label col-sm-2" for="lat">Vĩ độ:</label>
+			<div class="col-sm-10">
+				<input type="text" name="lat" id="lat" class="form-control input-xlarge"/>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-sm-2" for="lon">Kinh độ:</label>
+			<div class="col-sm-10">
+				<input type="text" name="lon" id="lon" class="form-control input-xlarge"/>
+			</div>
+		</div>
+		</div>
+		<div class="form-group" id="mapdiv">
+			<div class="col-lg-12">
+				<div id="map"></div>
+			</div>
+		</div>
+		<!--end map-->
+		  
+        </div>
+        <!-- / Building Form. -->
+
+        <!-- Components -->
+        <div class="span6">
+          <h2>Drag & Drop components</h2>
+          <hr>
+          <div class="tabbable">
+            <ul class="nav nav-tabs" id="formtabs">
+              <!-- Tab nav -->
+            </ul>
+            <form class="form-horizontal" id="components">
+              <fieldset>
+                <div class="tab-content">
+                  <!-- Tabs of snippets go here -->
+                </div>
+              </fieldset>
+            </form>
+          </div>
+        </div>
+        <!-- / Components -->
+
+      </div>
+
+      <div class="row clearfix">
+        <div class="span12">
+          <hr>
+          By soiqualang_chentreu
+        </div>
+      </div>
+
+    </div> <!-- /container -->
+
+    <script data-main="assets/js/main.js" src="assets/js/lib/require.js" ></script>
+  </body>
+</html>

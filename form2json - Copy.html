@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+<style>
+body {
+  margin: 2em auto;
+  max-width: 600px;
+}
+
+form div {
+    margin-bottom: 0.5em;
+}
+form div label, form div input {
+    display: block;
+    margin-bottom: 0.3em;
+}
+
+</style>
+<script>
+//https://codepen.io/anon/pen/pOjZvN
+(function() {
+	function toJSONString( form ) {
+		var obj = {};
+		var elements = form.querySelectorAll( "input, select, textarea, file" );
+		for( var i = 0; i < elements.length; ++i ) {
+			var element = elements[i];
+			var name = element.name;
+			var value = element.value;
+
+			if( name ) {
+				obj[ name ] = value;
+			}
+		}
+
+		return JSON.stringify( obj );
+	}
+
+	document.addEventListener( "DOMContentLoaded", function() {
+		var form = document.getElementById( "test" );
+		//var form = document.getElementsByTagName( "form" );
+		var output = document.getElementById( "output" );
+		form.addEventListener( "submit", function( e ) {
+			e.preventDefault();
+			var json = toJSONString( this );
+			output.innerHTML = json;
+
+		}, false);
+
+	});
+
+})();
+</script>
+</head>
+
+<body>
+<form id="test" action="#" method="post">
+    <fieldset>
+
+<!-- Form Name -->
+<legend>Form Name</legend>
+
+<!-- Text input-->
+<div class="control-group">
+  <label class="control-label" for="txtname">Tên</label>
+  <div class="controls">
+    <input id="txtname" name="txtname" type="text" placeholder="Nhập tên" class="input-xlarge">
+    <p class="help-block">Nhập tên vào đây</p>
+  </div>
+</div>
+
+<!-- Password input-->
+<div class="control-group">
+  <label class="control-label" for="txtpass">Mật khẩu</label>
+  <div class="controls">
+    <input id="txtpass" name="txtpass" type="password" placeholder="Nhập mật khẩu" class="input-xlarge">
+    <p class="help-block">Nhập mật khẩu</p>
+  </div>
+</div>
+
+<!-- File Button --> 
+<div class="control-group">
+  <label class="control-label" for="txtfile">Upload</label>
+  <div class="controls">
+    <input id="txtfile" name="txtfile" class="input-file" type="file">
+  </div>
+</div>
+
+<!-- Button -->
+<div class="control-group">
+  <label class="control-label" for="btngui">Lưu</label>
+  <div class="controls">
+    <button id="btngui" name="btngui" class="btn btn-success">Lưu</button>
+  </div>
+</div>
+
+</fieldset>
+    <p>
+        <input type="submit" value="Send" class="btn btn-primary btn-block" />
+    </p>
+</form>	
+<pre id="output"></pre>
+</body>
+</html>
